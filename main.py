@@ -2,6 +2,48 @@ from flask import Flask , render_template, request
 
 app=Flask(__name__)
 
+class Zodiaco:
+    def obtener_signo_chino(self, anio):
+        signos = [
+            "mono", "gallo", "perro", "cerdo", "rata", "buey",
+            "tigre", "conejo", "dragon", "serpiente", "caballo", "cabra"
+        ]
+        return signos[anio % 12]  # Determina el signo basado en el módulo 12
+
+@app.route('/Zodiaco')
+def zodiacochino():
+    return render_template('Zodiaco.html')
+
+@app.route("/Procesar", methods=["GET", "POST"])  
+def procesarzodiaco():
+    nombre = ""
+    apellidoPa = ""
+    apellidoMa = ""
+    edad = ""
+    signo = ""
+    imagen = ""
+
+    if request.method == "POST":
+
+        nombre = request.form["nombre"]
+        apellidoPa = request.form["apellidoPa"]
+        apellidoMa = request.form["apellidoMa"]
+        dia = request.form["dia"]
+        mes = request.form["mes"]
+        anio = request.form["anio"]
+
+        if anio.isdigit():  
+            anio = int(anio)
+            edad = 2025 - anio  
+            zodiaco = Zodiaco()  
+            signo = zodiaco.obtener_signo_chino(anio)  # Usar el método de la clase Zodiaco
+            imagen = f"img/{signo}.png"
+
+    return render_template("Zodiaco.html", nombre=nombre, apellidoPa=apellidoPa, apellidoMa=apellidoMa,
+                           edad=edad, signo=signo, imagen=imagen)
+
+
+
 @app.route('/')
 def index():
     titulo = "IDGS801"
@@ -104,6 +146,8 @@ def result():
             resultado = "Error: Seleccione una operación válida"
 
     return render_template("OperasBas.html", resultado=resultado)
+
+    
 
 
 
