@@ -1,4 +1,5 @@
 from flask import Flask , render_template, request
+import forms
 
 app=Flask(__name__)
 
@@ -146,6 +147,20 @@ def result():
             resultado = "Error: Seleccione una operación válida"
 
     return render_template("OperasBas.html", resultado=resultado)
+
+@app.route("/Alumnos", methods=["GET", "POST"])
+def alumnos():
+    mat=''
+    nom=''
+    ape=''
+    email=''
+    alumno_clas=forms.UserForm(request.form)
+    if request.method == 'POST':
+        mat = alumno_clas.matricula.data
+        nom = alumno_clas.nombre.data
+        ape = alumno_clas.apellido.data
+        email = alumno_clas.correo.data 
+    return render_template("Alumnos.html", form=alumno_clas,mat=mat,nom=nom, ape=ape, email=email)
 
     
 
