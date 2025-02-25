@@ -47,8 +47,20 @@
     </div>
  
     <div class="container">
+
        
-                   
+                {%with messages=get_flashed_messages%}  
+                {%if messages%}
+                    {%for messaage in messages %}
+                    <div class="alert alert-success">
+                        {{messaage}}
+
+                    </div>
+                    {%endfor%}
+
+
+                {%endif%}
+                {%endwith%}
  
                 {% block content%}
            

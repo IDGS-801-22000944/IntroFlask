@@ -1,7 +1,32 @@
 from flask import Flask , render_template, request
 import forms
+from flask_wtf.csrf import CSRProtect
+from flask import flash
+
+from flask import g
+
+
+
 
 app=Flask(__name__)
+app.secret_key="esta es una clave secreta"
+csrf=CSRProtect
+
+@app.errorhandler(404)
+def page_notfound(e):
+    return render_template('404.html'), 404
+
+@app.before_request
+def before_requestr():
+    g.user = "Mario"
+    print("before1")
+
+@app.after_request
+def after_requestr(response):
+    print("after3")
+    return response
+
+
 
 class Zodiaco:
     def obtener_signo_chino(self, anio):
@@ -150,16 +175,19 @@ def result():
 
 @app.route("/Alumnos", methods=["GET", "POST"])
 def alumnos():
-    mat=''
+    mat=0
     nom=''
     ape=''
     email=''
     alumno_clas=forms.UserForm(request.form)
-    if request.method == 'POST':
+    if request.method == 'POST' and alumno_clas.validate():
         mat = alumno_clas.matricula.data
         nom = alumno_clas.nombre.data
         ape = alumno_clas.apellido.data
         email = alumno_clas.correo.data 
+
+        mensaje='Bienvenido {}'.format(nom)
+        flash(mensaje)
     return render_template("Alumnos.html", form=alumno_clas,mat=mat,nom=nom, ape=ape, email=email)
 
     
@@ -167,4 +195,5 @@ def alumnos():
 
 
 if __name__ == "__main__":
+    csrf.init_app(app)
     app.run(debug=True, port=5000)
