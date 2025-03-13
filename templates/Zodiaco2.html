@@ -1,0 +1,45 @@
+{% extends "layoutZodiaco.html" %}
+{% block content %}
+{% import "_macrosZodiaco.html" as macro %}
+
+<form method="POST" action="/Procesar">
+    {{ form.hidden_tag() }}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="formu card p-3">
+                <h5 class="title text-center">Datos Personales</h5>
+
+                {{ macro.camposNuevos(form.nombre) }}
+                {{ macro.camposNuevos(form.apellidoPa) }}
+                {{ macro.camposNuevos(form.apellidoMa) }}
+
+                <label>Fecha de Nacimiento</label>
+                <div class="d-flex">
+                    {{ macro.camposFecha(form.dia, "Día") }}
+                    {{ macro.camposFecha(form.mes, "Mes") }}
+                    {{ macro.camposFecha(form.anio, "Año") }}
+                </div>
+
+                <label>Sexo</label>
+                <div>
+                    {{ form.sexo() }}
+                </div>
+
+                <button class="btn btn-dark mt-3 w-100" type="submit">IMPRIMIR</button>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="resultado">
+                <h3>Hola <span>{{ nombre }} {{ apellidoPa }} {{ apellidoMa }}</span></h3>
+                <p>Tienes <strong>{{ edad }}</strong> años</p>
+                <p>Tu signo zodiacal chino es: <strong>{{ signo }}</strong></p>
+                {% if imagen %}
+                    <img class="signo-img" src="{{ url_for('static', filename=imagen) }}" alt="{{ signo }}">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

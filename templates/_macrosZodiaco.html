@@ -1,0 +1,19 @@
+{% macro camposNuevos(field) %}
+    <div class="mb-3">
+        {{ field.label }}
+        {{ field(class="form-control") }}
+        {% if field.errors %}
+            <ul>
+                {% for error in field.errors %}
+                    <li style="color: red;">{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro camposFecha(field, placeholder) %}
+    <div class="me-1">
+        {{ field(class="form-control", placeholder=placeholder) }}
+    </div>
+{% endmacro %}

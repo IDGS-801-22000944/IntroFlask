@@ -1,8 +1,8 @@
 from flask import Flask , render_template, request
 import forms
-from flask_wtf.csrf import CSRProtect
+import formsZodiaco
+from flask_wtf.csrf import CSRFProtect
 from flask import flash
-
 from flask import g
 
 
@@ -10,7 +10,8 @@ from flask import g
 
 app=Flask(__name__)
 app.secret_key="esta es una clave secreta"
-csrf=CSRProtect
+csrf = CSRFProtect()
+
 
 @app.errorhandler(404)
 def page_notfound(e):
@@ -26,22 +27,27 @@ def after_requestr(response):
     print("after3")
     return response
 
-
-
 class Zodiaco:
+    signos = {
+        0: "Mono", 1: "Gallo", 2: "Perro", 3: "Cerdo",
+        4: "Rata", 5: "Buey", 6: "Tigre", 7: "Conejo",
+        8: "Dragon", 9: "Serpiente", 10: "Caballo", 11: "Cabra"
+    }
+
     def obtener_signo_chino(self, anio):
-        signos = [
-            "mono", "gallo", "perro", "cerdo", "rata", "buey",
-            "tigre", "conejo", "dragon", "serpiente", "caballo", "cabra"
-        ]
-        return signos[anio % 12]  # Determina el signo basado en el módulo 12
+        return self.signos[anio % 12]
 
-@app.route('/Zodiaco')
+@app.route('/Zodiaco', methods=["GET", "POST"])
 def zodiacochino():
-    return render_template('Zodiaco.html')
+    form = formsZodiaco.ZodiacoForm() 
+    return render_template("Zodiaco2.html", form=form)
 
-@app.route("/Procesar", methods=["GET", "POST"])  
+@app.route("/Procesar", methods=["GET", "POST"])
 def procesarzodiaco():
+    
+    form = formsZodiaco.ZodiacoForm(request.form)
+
+
     nombre = ""
     apellidoPa = ""
     apellidoMa = ""
@@ -49,24 +55,24 @@ def procesarzodiaco():
     signo = ""
     imagen = ""
 
-    if request.method == "POST":
+    if form.validate_on_submit():
+        nombre = form.nombre.data
+        apellidoPa = form.apellidoPa.data
+        apellidoMa = form.apellidoMa.data
+        anio = form.anio.data
+        edad = 2025 - anio  
 
-        nombre = request.form["nombre"]
-        apellidoPa = request.form["apellidoPa"]
-        apellidoMa = request.form["apellidoMa"]
-        dia = request.form["dia"]
-        mes = request.form["mes"]
-        anio = request.form["anio"]
+        zodiaco = Zodiaco()
+        signo = zodiaco.obtener_signo_chino(anio)
+        imagen = f"img/{signo}.png"
 
-        if anio.isdigit():  
-            anio = int(anio)
-            edad = 2025 - anio  
-            zodiaco = Zodiaco()  
-            signo = zodiaco.obtener_signo_chino(anio)  # Usar el método de la clase Zodiaco
-            imagen = f"img/{signo}.png"
+        flash(f"Bienvenido, {nombre}!")
 
-    return render_template("Zodiaco.html", nombre=nombre, apellidoPa=apellidoPa, apellidoMa=apellidoMa,
-                           edad=edad, signo=signo, imagen=imagen)
+    return render_template("Zodiaco2.html", form=form, nombre=nombre, apellidoPa=apellidoPa,
+                           apellidoMa=apellidoMa, edad=edad, signo=signo, imagen=imagen)
+
+
+
 
 
 
@@ -173,24 +179,25 @@ def result():
 
     return render_template("OperasBas.html", resultado=resultado)
 
+    
 @app.route("/Alumnos", methods=["GET", "POST"])
-def alumnos():
-    mat=0
+def Alumnos():
+    mat=''
     nom=''
     ape=''
     email=''
-    alumno_clas=forms.UserForm(request.form)
-    if request.method == 'POST' and alumno_clas.validate():
+    
+    alumno_clas = forms.UserForm(request.form)
+    if request.method == "POST" and alumno_clas.validate():
         mat = alumno_clas.matricula.data
         nom = alumno_clas.nombre.data
         ape = alumno_clas.apellido.data
-        email = alumno_clas.correo.data 
+        email = alumno_clas.correo.data
 
-        mensaje='Bienvenido {}'.format(nom)
+        mensaje='BIENVENIDO{}'.format(nom)
         flash(mensaje)
-    return render_template("Alumnos.html", form=alumno_clas,mat=mat,nom=nom, ape=ape, email=email)
 
-    
+    return render_template("Alumnos.html", form=alumno_clas, mat=mat, nom=nom, ape=ape, email=email)
 
 
 
